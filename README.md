@@ -1,2 +1,2 @@
 # freez-OS
-Open Source No-Frost Refrigerator Firmware and Operation System
+Open Source No-Frost Refrigerator Firmware and Operating System
