@@ -1,108 +1,89 @@
 /*
- * Freez-OS refrigerator firmware for Arduino IDE
- * https://github.com/halimuygun/freez-OS
- * 
- * @author Halim Uygun
- * https://www.halimuygun.com 
- * 
- * Licensed under GPL-3.0
- * https://opensource.org/licenses/GPL-3.0
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * Revision Date: March 13, 2020
- * Version: 0.1.0
- */
+   Freez-OS refrigerator firmware for Arduino IDE
+   https://github.com/halimuygun/freez-OS
 
-#include <math.h>
-#include "Language.h"
+   @author Halim Uygun
+   https://www.halimuygun.com
+
+   Licensed under GPL-3.0
+   https://opensource.org/licenses/GPL-3.0
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   Revision Date: March 13, 2020
+   Version: 0.1.0
+*/
+
+#include "Arduino.h"
+#include "math.h"
 #include "Configuration.h"
+//#include "Language.h"
+#include "Command.h"
+#include "Temperature.h"
 
-
-#define led_blue 2
-#define led_red 4
-#define pin_reset 6
-
-long sec = 0;
-bool everymin = false;
-String timeNow = "00:00:00";
-int critical = 0;
-///
-
-double Termistor(int analogOkuma) {
-  double sicaklik;
-  sicaklik = log(((12000000 / analogOkuma) - 4800));
-  sicaklik = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * sicaklik * sicaklik)) * sicaklik);
-  sicaklik = sicaklik - 273.15;
-  return sicaklik;
-}
 
 void setup() {
-  pinMode(led_red, OUTPUT);
-  pinMode(led_blue, OUTPUT);
-  pinMode(pin_reset, OUTPUT);
+  pinMode(PIN_FREZ_LAMP, OUTPUT);
+  pinMode(PIN_REFR_LAMP, OUTPUT);
+  pinMode(PIN_FREZ_FAN, OUTPUT);
+  pinMode(PIN_REFR_FAN, OUTPUT);
+  pinMode(PIN_FREZ_HEATER, OUTPUT);
+  pinMode(PIN_REFR_HEATER, OUTPUT);
+  pinMode(PIN_COMPRESSOR, OUTPUT);
+  pinMode(PIN_COMPRESSOR_FAN, OUTPUT);
+  pinMode(PIN_RESET, OUTPUT);
 
-  if(SERIAL_POST == "ON")
-    Serial.begin(9600);
+  pinMode(LED_COOL, OUTPUT);
+  pinMode(LED_TEMPLIMIT, OUTPUT);
+  pinMode(LED_DEFROST, OUTPUT);
+
+  pinMode((int)SN_FREZ_DOOR, INPUT);
+  pinMode((int)SN_REFR_DOOR, INPUT);
+  pinMode((int)SN_FREZ_TEMP, INPUT);
+  pinMode((int)SN_REFR_TEMP, INPUT);
+  pinMode((int)SN_FREZ_HEAT_TEMP, INPUT);
+  pinMode((int)SN_REFR_HEAT_TEMP, INPUT);
+  pinMode((int)SN_X, INPUT);
+  pinMode((int)SN_Y, INPUT);
+
+  if (SERIAL_POST == "ON")
+    Serial.begin(SERIAL_BOUD_RATE);
 }
 
+
+
+
 void loop() {
-  int hour = sec / 3600;
-  int minute = (sec % 3600)/60;
-  int second = (sec % 3600) % 60;
-  timeNow = String(hour) + ":" + String(minute) + ":" + String(second);
+  timeLoop();
 
-  double extTemperature = Termistor(analogRead(A5));
-  
-  if (extTemperature >= 7)  {
-    critical += 1;
-    digitalWrite(led_red, HIGH);
-  }
-  else
-    digitalWrite(led_red, LOW);
-
-//  if ((extTemperature < 10) & (extTemperature > 6)) {
-//    critical = 0;
-//    digitalWrite(led_yellow, HIGH);
-//  }
-//  else
-//    digitalWrite(led_yellow, LOW);
-
-  if (extTemperature < 7) {
-    critical = 0;
-    //digitalWrite(led_reboot, LOW);
-    digitalWrite(led_blue, HIGH);
-  }
-  else
-    digitalWrite(led_blue, LOW);
+  checkTemperatureLimit("REFR");
+  //checkTemperatureLimit("FREZ");
 
 
-  if (critical > 2400)
+  if (CRITICAL_TEMP > 2700)
   {
-      //Serial.println("Rebooting..");
-      //digitalWrite(led_reboot, HIGH);
-      digitalWrite(pin_reset, HIGH);
+    //Serial.println("Rebooting..");
+
+    if (RESET_MODE == "on")
+    {
+      digitalWrite(PIN_RESET, HIGH);
       delay(500);
-      digitalWrite(pin_reset, LOW);
-      critical = 0;
+      digitalWrite(PIN_RESET, LOW);
+      CRITICAL_TEMP = 0;
+    }
   }
 
-  String dataString = "[" + timeNow + "]  Internal Temp: " + String(extTemperature);
-  dataString +=  ", Critical Time: " + String(critical) + " sec";
+  SERIAL_DATA_TEXT = "[" + TIME_STAMP + "]  Refr Temp: " + String(ACTUAL_REFR_TEMP)
+    + ", Critical Time: " + String(CRITICAL_TEMP) + " sec";
 
-  if (everymin)
-  {
-    everymin = false;
-  }
+ if (SERIAL_POST)
+    Serial.println(dataString);
 
-  //Serial.println(dataString);
   
-  sec += 1;
-  //if ((sec % 60) == 0)
-  //   everymin = true;
-     
-  delay(1000);
+
+
+  
 }
