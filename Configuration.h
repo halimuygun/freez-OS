@@ -9,9 +9,9 @@
 #define TELEMETRY_POST          "off"
 #define RESET_MODE              "on"
 #define SERIAL_BOUD_RATE        9600
-#define WIFI_AP                 "UYGUN 1.6Ghz"
-#define WIFI_PASSWORD           "*NisA07:OmeR03*"
-#define TOKEN                   "QXg6keBOlo2ZbqJueQYd"
+#define WIFI_AP                 "XXXXXXXX"
+#define WIFI_PASSWORD           "********"
+#define TOKEN                   "YYYYYYYYYYYYYYYYYYY"
 #define THINGSBOARD_SERVER      "demo.thingsboard.io"
 #define DATA_POST_DURATION      1000 //milisecond
 
