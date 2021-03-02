@@ -3,7 +3,6 @@
 #ifndef TEMPERATURE_H
 #define TEMPERATURE_H
 
-#include "Arduino.h"
 #include "Configuration.h"
 
 double readAVGTemperature(int ADC_PIN) {
@@ -17,14 +16,14 @@ double readAVGTemperature(int ADC_PIN) {
   return val;
 }
 
-//double Termistor(int tRead) {
-//  double temp;
-//  //sicaklik = log(((12000000 / analogOkuma) - 4800));
-//  temp = log(((10230000 / tRead) - 5000));
-//  temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * temp * temp)) * temp);
-//  temp = temp - 273.15;
-//  return temp;
-//}
+double oldTermistor(int tRead) {
+  double temp;
+  //sicaklik = log(((12000000 / analogOkuma) - 4800));
+  temp = log(((10230000 / tRead) - 5000));
+  temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * temp * temp)) * temp);
+  temp = temp - 273.15;
+  return temp;
+}
 
 double calculateThermistor(double ADC) { //Steinhart-Hart
   double V_NTC = (VCC * ADC) / 1023;
@@ -36,41 +35,33 @@ double calculateThermistor(double ADC) { //Steinhart-Hart
   return Temp;
 }
 
-//    double readThermistorTable() {
-//
-//    }
+double readThermistorTable() {
 
+}
 
-void checkTemperatureLimit(String AREA) {
-  int PIN, LIMIT;
+void readTemperatures() {
+  ACTUAL_FREZ_TEMP = calculateThermistor(readAVGTemperature((int)SN_FREZ_TEMP));
+  ACTUAL_REFR_TEMP = calculateThermistor(readAVGTemperature((int)SN_REFR_TEMP));
+  ACTUAL_FREZ_HEAT_TEMP = calculateThermistor(readAVGTemperature((int)SN_FREZ_HEAT_TEMP));
+  ACTUAL_REFR_HEAT_TEMP = calculateThermistor(readAVGTemperature((int)SN_REFR_HEAT_TEMP));
+}
 
-  if (AREA == "REFR")
-  {
-    PIN = (int)SN_REFR_TEMP;
-    LIMIT = REFR_LIMIT_TEMP;
-  }
-  else if (AREA == "FREZ")
-  {
-    PIN = (int)SN_FREZ_TEMP;
-    LIMIT = FREZ_LIMIT_TEMP;
-  }
+void checkTemperatureLimit() {
+  double TMP = calculateThermistor(readAVGTemperature((int)SN_LIMIT_TEMP));
 
-  double TMP = calculateThermistor(readAVGTemperature(PIN));
-
-  if (TMP >= LIMIT)  {
-    CRITICAL_TEMP += 1;
+  if (TMP >= LIMIT_TEMP)  {
+    CRITICAL_TIME += 1;
     digitalWrite(LED_TEMPLIMIT, HIGH);
   }
   else
     digitalWrite(LED_TEMPLIMIT, LOW);
 
-  if (TMP < LIMIT) {
-    CRITICAL_TEMP = 0;
+  if (TMP < LIMIT_TEMP) {
+    CRITICAL_TIME = 0;
     digitalWrite(LED_COOL, HIGH);
   }
   else
     digitalWrite(LED_COOL, LOW);
-
 }
 
 

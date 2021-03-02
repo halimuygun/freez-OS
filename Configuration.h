@@ -3,36 +3,42 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include "Language.h"
+
 ////////////////////    Settings    ////////////////////
 #define LANGUAGE_SELECT         "tr"
 #define SERIAL_POST             "on"
 #define TELEMETRY_POST          "off"
 #define RESET_MODE              "on"
 #define SERIAL_BOUD_RATE        9600
-#define WIFI_AP                 "XXXXXXXX"
-#define WIFI_PASSWORD           "********"
-#define TOKEN                   "YYYYYYYYYYYYYYYYYYY"
-#define THINGSBOARD_SERVER      "demo.thingsboard.io"
-#define DATA_POST_DURATION      1000 //milisecond
+#define WIFI_AP                 "***YOUR_SSID***"
+#define WIFI_PASSWORD           "***WIFI_PASS***"
+#define TOKEN                   "*****TOKEN*****"
+#define MQTT_SERVER             "telemetry.mqtt.org"
+#define DATA_POST_DURATION      1000 // Milisecond
 
 ////////////////////    Setup Values    ////////////////////
 // FREZ: FREEZER
 // REFR: REFRIGERATOR
 
-#define FREZ_SET_TEMP         -18
+#define FREZ_SET_TEMP          -16
 #define REFR_SET_TEMP           4
 
-#define FREZ_LIMIT_TEMP       -14
+#define FREZ_LIMIT_TEMP        -12
 #define REFR_LIMIT_TEMP         8
 
-#define FREZ_HEAT_LIMIT_TEMP   50
-#define REFR_HEAT_LIMIT_TEMP   50
+#define FREZ_HEAT_LIMIT_TEMP    50
+#define REFR_HEAT_LIMIT_TEMP    50
+
+#define LIMIT_TEMP              8 // External sensor read temp
+#define RESET_TIME              2700 // Minutes
 
 ////////////////////    Technique Values    ////////////////////
 #define THERMISTOR              5 // Ex: 5 is 5k
 #define THERMISTOR_TOLERANCE    1
-#define VCC                     5
+#define VCC                     5 // 5 volt for arduino
 #define RS_THERMISTOR           5000
+#define THERMISTOR_MODE         "calc" // calc or table
 
 ////////////////////    Pins    ////////////////////
 // Outputs
@@ -55,20 +61,20 @@
 #define SN_FREZ_DOOR            "A0"
 #define SN_REFR_DOOR            "A1"
 #define SN_FREZ_TEMP            "A2"
-#define SN_REFR_TEMP            "A5"
+#define SN_REFR_TEMP            "A3"
 #define SN_FREZ_HEAT_TEMP       "A4"
-#define SN_REFR_HEAT_TEMP       "A5"
-#define SN_X                    "A6"
-#define SN_Y                    "A7"
+#define SN_REFR_HEAT_TEMP       "A6"
+#define SN_LIMIT_TEMP           "A5"
 
 ////////////////////    Global Values    ////////////////////
-String  TIME_STAMP        =       "00:00:00";
-String  SERIAL_DATA_TEXT  =       "";
-int     ACTUAL_REFR_TEMP  =       0;
-int     ACTUAL_FREZ_TEMP  =       0;
-int     CRITICAL_TEMP     =       0;
-long    SECOND            =       0;
-
+String  TIME_STAMP              =   "00:00:00";
+int     ACTUAL_FREZ_TEMP        =   0;
+int     ACTUAL_REFR_TEMP        =   0;
+int     ACTUAL_FREZ_HEAT_TEMP   =   0;
+int     ACTUAL_REFR_HEAT_TEMP   =   0;
+int     CRITICAL_TIME           =   0; // Minute
+long    SECOND                  =   0;
+long    MINUTE                  =   0;
 
 
 #endif

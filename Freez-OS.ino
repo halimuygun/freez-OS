@@ -18,9 +18,9 @@
 */
 
 #include "Arduino.h"
-#include "math.h"
+#include "Math.h"
 #include "Configuration.h"
-//#include "Language.h"
+#include "Language.h"
 #include "Command.h"
 #include "Temperature.h"
 
@@ -46,43 +46,20 @@ void setup() {
   pinMode((int)SN_REFR_TEMP, INPUT);
   pinMode((int)SN_FREZ_HEAT_TEMP, INPUT);
   pinMode((int)SN_REFR_HEAT_TEMP, INPUT);
-  pinMode((int)SN_X, INPUT);
-  pinMode((int)SN_Y, INPUT);
+  pinMode((int)SN_LIMIT_TEMP, INPUT);
 
-  if (SERIAL_POST == "ON")
-    Serial.begin(SERIAL_BOUD_RATE);
+  Serial.begin(SERIAL_BOUD_RATE);
+
+  if(Serial) {
+    sendSerial(TXT_STARTED);
+  }  
 }
-
-
-
 
 void loop() {
   timeLoop();
+  readTemperatures();
+  checkTemperatureLimit();
 
-  checkTemperatureLimit("REFR");
-  //checkTemperatureLimit("FREZ");
-
-
-  if (CRITICAL_TEMP > 2700)
-  {
-    //Serial.println("Rebooting..");
-
-    if (RESET_MODE == "on")
-    {
-      digitalWrite(PIN_RESET, HIGH);
-      delay(500);
-      digitalWrite(PIN_RESET, LOW);
-      CRITICAL_TEMP = 0;
-    }
-  }
-
-  SERIAL_DATA_TEXT = "[" + TIME_STAMP + "]  Refr Temp: " + String(ACTUAL_REFR_TEMP)
-    + ", Critical Time: " + String(CRITICAL_TEMP) + " sec";
-
- if (SERIAL_POST)
-    Serial.println(dataString);
-
-  
 
 
   
